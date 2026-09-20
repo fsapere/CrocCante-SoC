@@ -1,0 +1,102 @@
+# Compiled Software (C/C++/Assembly)
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+*.su
+bin/
+
+# EDA Tools / Simulation (Verilator, vsim, yosys, openroad)
+Croc_Files/verilator/obj_dir/
+/vsim/work/
+transcript
+modelsim.ini
+vsim.wlf
+*.log
+*.jou
+*.pb
+*.fst
+
+# Backend/Synthesis generated directories
+Croc_Files/openroad/out/
+Croc_Files/openroad/logs/
+Croc_Files/openroad/reports/
+Croc_Files/yosys/out/
+Croc_Files/yosys/reports/
+Croc_Files/yosys/logs/
+Scripting/logs/
+
+# Editor / IDE
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary folders (run_baseline_flow.sh stages the baseline in tmp/)
+tmp/
+/tmp/
+
+# Cockpit / EDA generated files from env.sh
+/Croc_Files/.gitignore
+/Croc_Files/dfii/
+# Klayout: track signoff scripts (run_drc.sh, def2gds.sh); ignore generated output
+/Croc_Files/klayout/out/
+/Croc_Files/klayout/drc/out/
+/Croc_Files/klayout/lvs/
+#/Croc_Files/klayout/.klayout/
+/Croc_Files/klayout/drc/tech/
+/Croc_Files/klayout/*-example
+/Croc_Files/klayout/start_klayout
+/Croc_Files/klayout/*.gds
+/Croc_Files/klayout/*.oas
+/Croc_Files/klayout/*.lyrdb
+
+# IHP PDK and icdesign generated files
+/Croc_Files/ihp13/pdk/
+/Croc_Files/ihp13/models/
+/Croc_Files/ihp13/.innovus/
+/Croc_Files/ihp13/.synopsys/
+/Croc_Files/ihp13/.modelsim/
+/Croc_Files/ihp13/setup.log
+/Croc_Files/ihp13/setup.csh
+/Croc_Files/ihp13/env.sh
+Croc_Files/sw/build/
+
+# IHP rules for parasitic extraction
+Croc_Files/ihp13/IHP_rcx_patterns.rules
+
+# VCD file
+Croc_Files/vsim/croc.vcd
+
+# VSIM related files
+Croc_Files/vsim/reports/
+Croc_Files/vsim/work/
+*.vstf
+
+# Verilator waveform dump file
+Croc_Files/verilator/croc.fst.hier
+# Reworked .c scripts summary
+Scripting/summary.txt
+# Summary Metrics
+Scripting/metrics_*.json
+
+# Fixed VCD from fixvcd.py
+Croc_Files/vsim/croc_fixed.vcd
+
+# Generated plots and Python cache
+plots/
+__pycache__/
+
+# Course environment (cockpit technology, Calibre LVS setup): not distributed
+Croc_Files/technology
+Croc_Files/calibre/
