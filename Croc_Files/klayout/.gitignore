@@ -1,0 +1,7 @@
+drc/
+out/
+*.lyp
+*.map
+*.lyt
+.klayout/klayoutrc*
+.klayout/tech/
