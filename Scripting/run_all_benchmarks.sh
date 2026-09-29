@@ -26,9 +26,6 @@ run_and_extract() {
 echo "========================================"
 echo "    Running Functional Verification     "
 echo "========================================"
-# Note: benchmarking.c currently might not compile due to old wrapper calls, 
-# but if it does, its outputs won't have [SUMMARY] unless added. 
-# Left here as it was in the original script.
 run_and_extract "test_cordic_correctness" "Functional Verification"
 
 echo "========================================"

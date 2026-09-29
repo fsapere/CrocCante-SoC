@@ -11,7 +11,7 @@
 #   ./run_functional_verification.sh
 #
 # Default program:
-#   benchmarking
+#   helloworld
 
 set -euo pipefail
 
@@ -22,7 +22,7 @@ ENV_SH="$CROC_FILES_DIR/env.sh"
 SW_DIR="$CROC_FILES_DIR/sw"
 VERILATOR_DIR="$CROC_FILES_DIR/verilator"
 OSEDA_VERSION="${OSEDA_VERSION:-2026.02}"
-PROGRAM_NAME="${PROGRAM_NAME:-benchmarking}"
+PROGRAM_NAME="${PROGRAM_NAME:-helloworld}"
 OSEDA_MARKER="CROC_RUNNING_IN_OSEDA"
 
 if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
@@ -40,8 +40,8 @@ Usage:
 
 Options:
     --help, -h                Show this help message
-    --program NAME            Build and run sw/NAME.c as NAME.hex
-                              Default: benchmarking
+    --program NAME            Build and run sw/NAME.c or sw/test/NAME.c
+                              Default: helloworld
     --oseda-version VERSION   OSEDA container version to use
                               Default: 2026.02
     --inside-oseda            Internal marker used by the wrapper
@@ -71,8 +71,11 @@ run_flow() {
 
     source "$ENV_SH"
 
-    local hex_name="${PROGRAM_NAME}.hex"
-    local hex_path="bin/${hex_name}"
+    # The Makefile mirrors the source tree: sw/test/NAME.c is built as bin/test/NAME.hex
+    local hex_path="bin/${PROGRAM_NAME}.hex"
+    if [[ ! -f "$SW_DIR/${PROGRAM_NAME}.c" && -f "$SW_DIR/test/${PROGRAM_NAME}.c" ]]; then
+        hex_path="bin/test/${PROGRAM_NAME}.hex"
+    fi
 
     echo "[INFO][FLOW] Repository root : $REPO_ROOT"
     echo "[INFO][FLOW] Croc files dir  : $CROC_FILES_DIR"

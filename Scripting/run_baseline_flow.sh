@@ -1,6 +1,9 @@
 #!/bin/bash
-# Wrapper script to run the baseline flow using the exact reference flow structure
-# but injecting the user's custom power simulation and extracting only the final metrics.
+# Runs the full flow on the baseline Croc SoC (reference flow from the course exercises),
+# injecting our power simulation setup, and exports only the final metrics.
+#
+# Usage:
+#   BASELINE_SRC=/path/to/reference/croc ./run_baseline_flow.sh
 
 set -euo pipefail
 
@@ -8,8 +11,11 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 CROC_FILES_DIR="$REPO_ROOT/Croc_Files"
 
-# The user requested to run the full flow EXACTLY like the reference, inside Solutions/reference_flow
-REF_FLOW_ROOT="$REPO_ROOT/Solutions/reference_flow"
+# Reference Croc flow (course exercise solution); not distributed with this repository
+BASELINE_SRC="${BASELINE_SRC:?Set BASELINE_SRC to the reference Croc flow directory (rtl/, openroad/, yosys/, ...)}"
+
+# Staged under tmp/ (git-ignored); 04a_plot_area_comparison.py reads the baseline area report from here
+REF_FLOW_ROOT="$REPO_ROOT/tmp/baseline_run"
 STAGING_CROC_FILES="$REF_FLOW_ROOT/Croc_Files"
 STAGING_SCRIPTING="$REF_FLOW_ROOT/Scripting"
 
@@ -18,19 +24,19 @@ rm -rf "$REF_FLOW_ROOT"
 mkdir -p "$STAGING_CROC_FILES"
 mkdir -p "$STAGING_SCRIPTING"
 
-echo "[INFO] Copying sol11 into reference_flow/Croc_Files..."
-# sol11 IS the reference flow (it has rtl, openroad, yosys etc. at the root level).
-# We place it inside Croc_Files to match the structure that run_full_flow.sh expects.
-cp -r /scratch/vlsi2_01fs26/ExSolutions/sol11/* "$STAGING_CROC_FILES/"
+echo "[INFO] Copying the reference flow from $BASELINE_SRC into the staging Croc_Files..."
+# The reference flow has rtl, openroad, yosys etc. at the root level:
+# we place it inside Croc_Files to match the structure that run_full_flow.sh expects.
+cp -r "$BASELINE_SRC"/* "$STAGING_CROC_FILES/"
 
-echo "[INFO] Copying user's Scripting folder into reference_flow..."
+echo "[INFO] Copying the Scripting folder into the staging area..."
 cp -r "$SCRIPT_DIR/"* "$STAGING_SCRIPTING/"
 
-echo "[INFO] Copying user's power sim files into reference flow..."
-# The user wants to use their own power simulation and performance benchmarking.
-cp "$CROC_FILES_DIR/sw/test_baseline_power.c" "$STAGING_CROC_FILES/sw/"
-cp "$CROC_FILES_DIR/sw/test_baseline_performance.c" "$STAGING_CROC_FILES/sw/"
+echo "[INFO] Copying our power simulation files into the staging area..."
+mkdir -p "$STAGING_CROC_FILES/sw/test"
+cp "$CROC_FILES_DIR/sw/test/test_baseline_power.c" "$STAGING_CROC_FILES/sw/test/"
 cp -r "$CROC_FILES_DIR/vsim" "$STAGING_CROC_FILES/"
+cp "$CROC_FILES_DIR/ihp13/empty_cells.v" "$STAGING_CROC_FILES/ihp13/"
 cp "$CROC_FILES_DIR/openroad/scripts/06_power.tcl" "$STAGING_CROC_FILES/openroad/scripts/"
 cp "$CROC_FILES_DIR/openroad/scripts/07_IRdrop.tcl" "$STAGING_CROC_FILES/openroad/scripts/"
 cp "$CROC_FILES_DIR/openroad/scripts/extractspef.tcl" "$STAGING_CROC_FILES/openroad/scripts/"
@@ -38,42 +44,19 @@ cp "$CROC_FILES_DIR/openroad/scripts/extractspef.tcl" "$STAGING_CROC_FILES/openr
 # The post-layout power sim requires the updated testbench to dump the VCD properly
 cp "$CROC_FILES_DIR/rtl/test/tb_croc_soc.sv" "$STAGING_CROC_FILES/rtl/test/"
 
-echo "[INFO] Patching postlayout_powersim.sh for reference flow..."
-cd "$STAGING_SCRIPTING"
-# Patch test_cordic_power to test_baseline_power since we're running baseline
-sed -i 's/test_cordic_power/test_baseline_power/g' postlayout_powersim.sh
-# Patch hardcoded absolute paths to point to the reference flow instead of the main repo
-sed -i "s|/scratch/vlsi2_01fs26/CrocCante/Croc_Files|$STAGING_CROC_FILES|g" postlayout_powersim.sh
+# postlayout_powersim.sh (called by run_full_flow.sh) simulates this program instead of test_cordic_power
+export POWER_PROGRAM="test_baseline_power"
 
-# Disable original run_all_benchmarks.sh and replace it with a baseline-specific one
-cat << 'EOF' > "$STAGING_SCRIPTING/run_all_benchmarks.sh"
+# The baseline has no accelerator to benchmark: compare_summaries.py takes the baseline
+# cycle count from the SW CORDIC run of the main flow, so no benchmark is run here.
+cat << 'EOF2' > "$STAGING_SCRIPTING/run_all_benchmarks.sh"
 #!/bin/bash
 set -euo pipefail
-SUMMARY_FILE="summary.txt"
-echo "========================================" > $SUMMARY_FILE
-echo "    Baseline Benchmark Summary          " >> $SUMMARY_FILE
-echo "========================================" >> $SUMMARY_FILE
-
-run_and_extract() {
-    local prog=$1
-    local title=$2
-    echo "Running $title ($prog)..."
-    echo "" >> $SUMMARY_FILE
-    echo "--- $title ---" >> $SUMMARY_FILE
-    ./run_functional_verification.sh --program $prog > tmp_${prog}.log 2>&1 || true
-    cat tmp_${prog}.log | grep "\[SUMMARY\]" | sed 's/.*\[SUMMARY\] //g' >> $SUMMARY_FILE || true
-    rm -f tmp_${prog}.log
-}
-
-run_and_extract "test_baseline_performance" "Baseline SW Performance"
-
-echo ""
-echo "==== SUMMARY REPORT ===="
-cat $SUMMARY_FILE
-echo "========================"
-EOF
+echo "Baseline flow: no benchmarks to run" > summary.txt
+EOF2
 chmod +x "$STAGING_SCRIPTING/run_all_benchmarks.sh"
 
+cd "$STAGING_SCRIPTING"
 echo "[INFO] Baseline shadow workspace ready."
 echo "[INFO] Executing full flow on baseline chip..."
 

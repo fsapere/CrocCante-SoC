@@ -59,7 +59,7 @@ EOF
         exit $backend_status
     fi
 
-    # Now we are BACK OUTSIDE OSEDA. Let's run the rest!
+    # Back outside OSEDA: QuestaSim and the summary scripts run on the host
     stage_banner "POST-LAYOUT POWER ANALYSIS (Outside OSEDA)"
     cd "$SCRIPT_DIR"
     ./postlayout_powersim.sh 2>&1 | tee -a "$LOG_FILE"

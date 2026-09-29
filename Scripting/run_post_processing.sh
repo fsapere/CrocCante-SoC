@@ -16,8 +16,7 @@ echo "================================================================="
 echo "        STARTING POST-PROCESSING (PLOTS & COMPARISON)            "
 echo "================================================================="
 
-# 1. Generate all the plots using the existing robust wrapper
-# It will put all plots in the CrocCante/plots/ directory.
+# 1. Generate all the plots (saved to plots/ in the repository root)
 bash "$SCRIPT_DIR/generate_plots.sh"
 
 # 2. Run the architectural comparison

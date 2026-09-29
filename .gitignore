@@ -18,7 +18,7 @@ vsim.wlf
 *.pb
 *.fst
 
-# Backend/Synthesis generated directories (adjust if you need them versioned)
+# Backend/Synthesis generated directories
 Croc_Files/openroad/out/
 Croc_Files/openroad/logs/
 Croc_Files/openroad/reports/
@@ -42,7 +42,7 @@ Scripting/logs/
 ehthumbs.db
 Thumbs.db
 
-# Temporary requested folder
+# Temporary folders (run_baseline_flow.sh stages the baseline in tmp/)
 tmp/
 /tmp/
 
@@ -71,10 +71,6 @@ tmp/
 /Croc_Files/ihp13/setup.csh
 /Croc_Files/ihp13/env.sh
 Croc_Files/sw/build/
-/memories/session/plan.md
-
-# Scratch files
-.scratch_clean_remove*
 
 # IHP rules for parasitic extraction
 Croc_Files/ihp13/IHP_rcx_patterns.rules
@@ -94,15 +90,13 @@ Scripting/summary.txt
 # Summary Metrics
 Scripting/metrics_*.json
 
-# Old Signoff Backup
-Croc_Files/klayout_old/
-Croc_Files/calibre_old/
-
-# Reference Reports
-Report_reference.pdf
-
-# Auxiliary files
+# Fixed VCD from fixvcd.py
 Croc_Files/vsim/croc_fixed.vcd
-bondpads/
-final_diff.txt
-pad_positions_gds.txt
+
+# Generated plots and Python cache
+plots/
+__pycache__/
+
+# Course environment (cockpit technology, Calibre LVS setup): not distributed
+Croc_Files/technology
+Croc_Files/calibre/
